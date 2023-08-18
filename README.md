@@ -12,6 +12,6 @@ docker run --rm -p8080:8080 echo-server
 ## Build native-image
 ```shell
 mvn -Pnative package
-docker build -f src/main/docker/Dockerfile.native . -t echo-server
-docker run --rm -p8080:8080 echo-server
+docker build -f src/main/docker/Dockerfile.native . -t echo-server-native
+docker run --rm -p8080:8080 echo-server-native
 ```
