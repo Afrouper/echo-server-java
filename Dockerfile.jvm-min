@@ -1,0 +1,43 @@
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest AS BUILDER
+
+RUN microdnf install --nodocs -y --setopt install_weak_deps=0 \
+    java-17-openjdk-headless ca-certificates
+
+FROM registry.access.redhat.com/ubi9/ubi-micro:latest
+
+LABEL description="Simple an small image base upon RedHats UBI images." \
+      maintainer="Afrouper"
+
+# Copy JVM Stuff to runtime image
+COPY --from=BUILDER --chown=root:root /usr/lib/jvm /usr/lib/jvm
+COPY --from=BUILDER --chown=root:root /usr/lib64/pkcs11/p11-kit-trust.so /usr/lib64/pkcs11/p11-kit-trust.so
+COPY --from=BUILDER --chown=root:root /etc/alternatives /etc/alternatives
+COPY --from=BUILDER --chown=root:root /etc/java /etc/java
+# up-to-date Root-CA certificates
+COPY --from=BUILDER --chown=root:root /etc/pki/java /etc/pki/java
+COPY --from=BUILDER --chown=root:root /etc/pki/ca-trust /etc/pki/ca-trust
+# Java time Zone mappings
+COPY --from=BUILDER --chown=root:root /usr/share/javazi-1.8 /usr/share/javazi-1.8
+COPY --from=BUILDER --chown=root:root /usr/share/javazi /usr/share/javazi
+
+ENV JAVA_HOME /etc/alternatives/jre
+ENV PATH=$PATH:${JAVA_HOME}/bin
+
+RUN echo "securerandom.source=file:/dev/urandom" >> ${JAVA_HOME}/lib/security/java.security
+COPY --chown=root:root scripts/run.sh /usr/bin
+
+WORKDIR /deployments
+EXPOSE 8080 8443
+USER 1001
+CMD ["run.sh"]
+
+#------------------ Use above as an base image for your projects ;-)
+
+# We make four distinct layers so if there are application changes the library layers can be re-used
+COPY --chown=1001 target/quarkus-app/lib/ /deployments/lib/
+COPY --chown=1001 target/quarkus-app/*.jar /deployments/
+COPY --chown=1001 target/quarkus-app/app/ /deployments/app/
+COPY --chown=1001 target/quarkus-app/quarkus/ /deployments/quarkus/
+
+ENV JAVA_OPTS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
