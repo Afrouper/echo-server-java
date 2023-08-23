@@ -48,8 +48,8 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
           images: |
-            afrouper/echo-service-java
-            ghcr.io/afrouper/echo-service-java
+            afrouper/echo-server-java
+            ghcr.io/afrouper/echo-server-java
 
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
