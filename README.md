@@ -7,7 +7,7 @@ It uses RedHat UBI images to get a trusted container environment
 ## Build Java
 ```shell
 mvn package
-docker build -f src/main/docker/Dockerfile.jvm . -t echo-server-java
+docker build -Dockerfile.jvm . -t echo-server-java
 docker run --rm -p8080:8080 echo-server-java
 ```
 
