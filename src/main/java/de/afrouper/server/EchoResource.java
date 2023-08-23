@@ -1,5 +1,6 @@
 package de.afrouper.server;
 
+import de.afrouper.server.dto.EchoReply;
 import io.quarkus.logging.Log;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;

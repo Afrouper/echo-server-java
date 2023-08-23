@@ -1,0 +1,24 @@
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest AS BUILD
+
+FROM registry.access.redhat.com/ubi9/ubi-micro:latest
+
+# The micro image did not contain theese libs and did not contain a package manager
+COPY --from=BUILD \
+   "/usr/lib64/libgcc_s.so.1" \
+   "/usr/lib64/libstdc++.so.6" \
+   "/usr/lib64/libz.so.1" \
+   /usr/lib64/
+
+WORKDIR /work/
+COPY target/*-runner /work/application
+
+# set up permissions for user `1001`
+RUN chmod 775 /work /work/application \
+  && chown -R 1001 /work \
+  && chmod -R "g+rwX" /work \
+  && chown -R 1001:root /work
+
+USER 1001
+EXPOSE 8080
+
+CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
