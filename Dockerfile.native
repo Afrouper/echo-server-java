@@ -6,7 +6,7 @@ COPY --from=BUILD \
    "/usr/lib64/libgcc_s.so.1" \
    "/usr/lib64/libstdc++.so.6" \
    "/usr/lib64/libz.so.1" \
-   /usr/lib64
+   /usr/lib64/
 
 WORKDIR /work/
 RUN chown 1001 /work \
