@@ -1,6 +1,7 @@
-FROM registry.access.redhat.com/ubi9/openjdk-17-runtime
+#FROM gcr.io/distroless/java17-debian12:latest
+FROM gcr.io/distroless/java-base-debian12
 
-ENV LANGUAGE='en_US:en'
+WORKDIR /deployments
 
 # We make four distinct layers so if there are application changes the library layers can be re-used
 COPY --chown=1001 target/quarkus-app/lib/ /deployments/lib/
@@ -8,8 +9,6 @@ COPY --chown=1001 target/quarkus-app/*.jar /deployments/
 COPY --chown=1001 target/quarkus-app/app/ /deployments/app/
 COPY --chown=1001 target/quarkus-app/quarkus/ /deployments/quarkus/
 
-EXPOSE 8080
+EXPOSE 8080 8443
 USER 1001
-ENV JAVA_OPTS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
-ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
-
+CMD ["/deployments/quarkus-run.jar"]

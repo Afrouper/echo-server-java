@@ -1,12 +1,4 @@
-FROM registry.access.redhat.com/ubi9/ubi-minimal AS BUILD
-
-FROM registry.access.redhat.com/ubi9/ubi-micro
-
-COPY --from=BUILD \
-   "/usr/lib64/libgcc_s.so.1" \
-   "/usr/lib64/libstdc++.so.6" \
-   "/usr/lib64/libz.so.1" \
-   /usr/lib64/
+FROM gcr.io/distroless/base-debian12
 
 WORKDIR /work/
 RUN chown 1001 /work \
